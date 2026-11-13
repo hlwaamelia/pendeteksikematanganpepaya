@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PapayaCheck – Cek Kematangan Pepaya</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#f3f8f1;--surface:#fff;--text:#16301f;--muted:#5b6f60;--line:#d6e3d3;--green:#2f7d3b;--yellow:#e3b92a;--orange:#e8741c;--brown:#7a4a22;--accent:#2f7d3b;--onaccent:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a12;--surface:#172419;--text:#e8f2e6;--muted:#9bb0a0;--line:#2b3d2e;--accent:#6fcf7d;--onaccent:#0f1a12;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1a12;--surface:#172419;--text:#e8f2e6;--muted:#9bb0a0;--line:#2b3d2e;--accent:#6fcf7d;--onaccent:#0f1a12;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.6 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 0}
+.logo{font-weight:800;font-size:20px;letter-spacing:-.02em}
+nav a{color:var(--muted);text-decoration:none;margin-left:20px;font-size:15px}
+nav a:hover{color:var(--text)}
+.hero{padding:36px 0 28px;max-width:680px}
+h1{font-size:clamp(34px,6vw,58px);line-height:1.05;letter-spacing:-.03em;font-weight:800;margin:0 0 14px}
+.lead{color:var(--muted);font-size:18px;margin:0}
+.drop{margin-top:26px;border:2px dashed var(--line);background:var(--surface);border-radius:20px;padding:34px 20px;text-align:center;transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--surface))}
+.drop svg{width:44px;height:44px;stroke:var(--accent);fill:none;stroke-width:1.6}
+.drop p{margin:8px 0 16px;color:var(--muted)}
+.btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+button,.btn{font:600 15px inherit;font-family:inherit;border-radius:12px;padding:12px 20px;border:1px solid var(--accent);cursor:pointer}
+.primary{background:var(--accent);color:var(--onaccent)}
+.ghost{background:transparent;color:var(--accent)}
+button:focus-visible,.drop:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.note{font-size:14px;color:var(--muted);margin-top:12px}
+#result{display:none;margin-top:28px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:24px}
+#result.show{display:grid}
+#preview{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:14px;background:var(--line)}
+.badge{display:inline-block;padding:4px 14px;border-radius:99px;font-weight:700;font-size:15px;color:#fff}
+h2{font-size:34px;letter-spacing:-.02em;margin:8px 0 4px;line-height:1.1}
+.gauge{position:relative;height:14px;border-radius:99px;margin:22px 0 6px;background:linear-gradient(90deg,var(--green),var(--yellow) 35%,var(--orange) 70%,var(--brown))}
+.pin{position:absolute;top:-6px;width:6px;height:26px;border-radius:3px;background:var(--text);border:2px solid var(--surface);transform:translateX(-50%);transition:left .5s}
+.scale{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.facts{margin:16px 0 0;padding:0;list-style:none}
+.facts li{padding:8px 0;border-top:1px solid var(--line)}
+.facts b{display:inline-block;min-width:110px}
+.comp{margin-top:14px}
+.row{display:flex;align-items:center;gap:10px;font-size:14px;margin:4px 0}
+.row span:first-child{width:62px;color:var(--muted)}
+.bar{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;transition:width .5s}
+.err{color:var(--orange);font-weight:600}
+section{padding:44px 0 8px}
+section h3{font-size:26px;letter-spacing:-.02em;margin:0 0 6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:18px}
+.card{border:1px solid var(--line);background:var(--surface);border-radius:16px;overflow:hidden}
+.sw{height:56px}
+.card div+div,.card .tx{padding:12px 14px 14px}
+.card h4{margin:0 0 4px;font-size:17px}
+.card p{margin:0;color:var(--muted);font-size:14px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:16px}
+.steps div{border-left:3px solid var(--accent);padding:2px 0 2px 14px}
+.steps b{display:block}
+.steps span{color:var(--muted);font-size:14px}
+footer{margin-top:44px;padding:22px 0 28px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+@media (max-width:700px){#result.show{grid-template-columns:1fr}nav a{margin-left:12px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="logo">🥭 PapayaCheck</div><nav><a href="#panduan">Panduan</a><a href="#cara">Cara kerja</a></nav></header>
+
+<div class="hero">
+<h1>Cek kematangan pepaya dalam hitungan detik</h1>
+<p class="lead">Foto pepayamu, lalu lihat apakah sudah siap dimakan, perlu dua hari lagi, atau sebaiknya segera diolah.</p>
+</div>
+
+<div class="drop" id="drop" tabindex="0">
+<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+<p>Seret foto pepaya ke sini, atau pilih dari perangkat</p>
+<div class="btns">
+<button class="primary" id="pick">Unggah foto</button>
+<button class="ghost" id="cam">Gunakan kamera</button>
+</div>
+<div class="note">Hasil paling akurat dengan latar polos, cahaya terang, dan pepaya memenuhi sebagian besar foto.</div>
+<input type="file" id="f1" accept="image/*" hidden>
+<input type="file" id="f2" accept="image/*" capture="environment" hidden>
+</div>
+<div id="msg" class="note err" role="alert"></div>
+
+<div id="result" aria-live="polite">
+<img id="preview" alt="Foto pepaya yang dianalisis">
+<div>
+<span class="badge" id="badge"></span>
+<h2 id="label"></h2>
+<div class="note" id="conf" style="margin:0"></div>
+<div class="gauge"><div class="pin" id="pin"></div></div>
+<div class="scale"><span>Mentah</span><span>Matang</span><span>Terlalu matang</span></div>
+<ul class="facts">
+<li><b>Siap dimakan</b><span id="shelf"></span></li>
+<li><b>Saran</b><span id="tip"></span></li>
+</ul>
+<div class="comp" id="comp"></div>
+<div class="btns" style="justify-content:flex-start;margin-top:18px"><button class="primary" id="again">Periksa pepaya lain</button></div>
+</div>
+</div>
+
+<section id="panduan">
+<h3>Ciri tiap tahap kematangan</h3>
+<div class="grid">
+<div class="card"><div class="sw" style="background:#3f8a3f"></div><div class="tx"><h4>Mentah</h4><p>Kulit hijau tua merata dan keras. Cocok untuk sayur atau rujak.</p></div></div>
+<div class="card"><div class="sw" style="background:linear-gradient(90deg,#3f8a3f,#d6b72e)"></div><div class="tx"><h4>Setengah matang</h4><p>Hijau mulai bersemburat kuning, terutama dari bagian bawah.</p></div></div>
+<div class="card"><div class="sw" style="background:linear-gradient(90deg,#e3b92a,#e8741c)"></div><div class="tx"><h4>Matang</h4><p>Kuning hingga oranye dominan, sedikit lunak saat ditekan.</p></div></div>
+<div class="card"><div class="sw" style="background:linear-gradient(90deg,#d9661a,#7a4a22)"></div><div class="tx"><h4>Terlalu matang</h4><p>Oranye tua, bercak cokelat, lembek. Pas untuk jus atau smoothie.</p></div></div>
+</div>
+</section>
+
+<section id="cara">
+<h3>Cara kerja</h3>
+<div class="steps">
+<div><b>Foto</b><span>Unggah atau ambil foto pepaya utuh.</span></div>
+<div><b>Analisis</b><span>Warna kulit dihitung langsung di perangkatmu. Foto tidak dikirim ke server.</span></div>
+<div><b>Hasil</b><span>Kamu mendapat tahap kematangan, perkiraan waktu, dan saran penyimpanan.</span></div>
+</div>
+</section>
+
+<footer>Perkiraan berdasarkan warna kulit, bukan pengganti cek langsung. Tekan pangkal buah dengan lembut untuk memastikan tingkat kelunakannya.</footer>
+</div>
+
+<script>
+var $=function(i){return document.getElementById(i)};
+var STAGES=[
+{k:'Mentah',c:'#2f7d3b',shelf:'Sekitar 5–7 hari lagi di suhu ruang',tip:'Simpan di suhu ruang, jauh dari sinar matahari. Bungkus kertas koran agar lebih cepat matang.'},
+{k:'Setengah matang',c:'#c79a12',shelf:'Sekitar 2–3 hari lagi',tip:'Biarkan di suhu ruang. Cek lagi setiap hari, dan jangan masuk kulkas dulu.'},
+{k:'Matang',c:'#e8741c',shelf:'Sekarang, atau dalam 1–2 hari',tip:'Siap dimakan. Kalau belum dikonsumsi, simpan di kulkas agar tahan sekitar 3–5 hari.'},
+{k:'Terlalu matang',c:'#7a4a22',shelf:'Segera, hari ini',tip:'Olah jadi jus, smoothie, atau puding. Buang bagian yang berbau asam atau berair berlebihan.'}];
+var COLS=[['Hijau','#2f7d3b'],['Kuning','#e3b92a'],['Oranye','#e8741c'],['Cokelat','#7a4a22']];
+
+function hsv(r,g,b){r/=255;g/=255;b/=255;var mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn,h=0;
+if(d){if(mx==r)h=((g-b)/d)%6;else if(mx==g)h=(b-r)/d+2;else h=(r-g)/d+4;h*=60;if(h<0)h+=360}
+return [h,mx?d/mx:0,mx]}
+
+function analyze(img){
+var W=200,sc=Math.min(1,W/Math.max(img.width,img.height)),w=Math.max(1,Math.round(img.width*sc)),h=Math.max(1,Math.round(img.height*sc));
+var cv=document.createElement('canvas');cv.width=w;cv.height=h;var ctx=cv.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,w,h);
+var x0=Math.round(w*.15),y0=Math.round(h*.15),cw=Math.round(w*.7),ch=Math.round(h*.7);
+var d=ctx.getImageData(x0,y0,cw,ch).data,n=[0,0,0,0],tot=0,all=cw*ch;
+for(var i=0;i<d.length;i+=4){var p=hsv(d[i],d[i+1],d[i+2]),H=p[0],S=p[1],V=p[2];
+if(S<.22||V<.12)continue;var k=-1;
+if(H>=60&&H<=170)k=0;else if(H>=40&&H<60)k=1;
+else if(H>=18&&H<40)k=V<.5?3:2;else if(H<18||H>=340)k=V<.55?3:2;
+if(k<0)continue;n[k]++;tot++}
+if(tot<all*.04)return null;
+var f=n.map(function(v){return v/tot});
+var idx=f[1]*1.2+f[2]*2+f[3]*3,T=[.5,1.3,2.4];
+var st=idx<T[0]?0:idx<T[1]?1:idx<T[2]?2:3;
+var dist=Math.min.apply(null,T.map(function(t){return Math.abs(idx-t)}));
+return {f:f,idx:idx,st:st,conf:Math.round(Math.min(96,55+dist*85))}}
+
+function show(file){
+$('msg').textContent='';
+if(!file||!/^image\//.test(file.type)){$('msg').textContent='File harus berupa gambar (JPG, PNG, atau WEBP).';return}
+var url=URL.createObjectURL(file),img=new Image();
+img.onload=function(){
+var r=analyze(img);
+if(!r){$('result').classList.remove('show');$('msg').textContent='Pepaya tidak terdeteksi. Coba foto lebih dekat dengan latar polos dan cahaya terang.';return}
+var s=STAGES[r.st];
+$('preview').src=url;
+$('badge').textContent=s.k;$('badge').style.background=s.c;
+$('label').textContent=s.k;
+$('conf').textContent='Perkiraan keyakinan sekitar '+r.conf+'%';
+$('pin').style.left=Math.min(97,Math.max(3,r.idx/3*100))+'%';
+$('shelf').textContent=s.shelf;$('tip').textContent=s.tip;
+$('comp').innerHTML=COLS.map(function(c,i){var p=Math.round(r.f[i]*100);
+return '<div class="row"><span>'+c[0]+'</span><div class="bar"><i style="width:'+p+'%;background:'+c[1]+'"></i></div><span style="width:36px;text-align:right">'+p+'%</span></div>'}).join('');
+$('result').classList.add('show');
+$('result').scrollIntoView({behavior:'smooth',block:'start'})};
+img.onerror=function(){$('msg').textContent='Gambar tidak bisa dibaca. Coba file lain.'};
+img.src=url}
+
+$('pick').onclick=function(){$('f1').click()};
+$('cam').onclick=function(){$('f2').click()};
+$('again').onclick=function(){$('result').classList.remove('show');window.scrollTo({top:0,behavior:'smooth'})};
+['f1','f2'].forEach(function(id){$(id).onchange=function(e){show(e.target.files[0]);e.target.value=''}});
+var dz=$('drop');
+dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('over')});
+dz.addEventListener('dragleave',function(){dz.classList.remove('over')});
+dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('over');show(e.dataTransfer.files[0])});
+</script>
+</body>
+</html>
